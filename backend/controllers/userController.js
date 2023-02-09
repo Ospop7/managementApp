@@ -1,6 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// Generate Token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+};
 
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
@@ -23,16 +29,20 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Email has already been registered");
   }
+
   //   we gothe hass the password before create the new user
 
-
-  
   // Create new user if user don't exit
   const user = await User.create({
     name,
     email,
     password,
   });
+
+  //   Generate Token
+  //   after create  A    new user we need GENERATE A TOKEN
+  const token = generateToken(user._id);
+
   if (user) {
     const { _id, name, email, photo, phone, bio } = user;
     res.status(201).json({
@@ -42,6 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
       photo,
       phone,
       bio,
+      token,
     });
   } else {
     res.status(400);
