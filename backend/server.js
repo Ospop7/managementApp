@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
+const userRoute = require("./routes/userRoute");
 const app = express();
 
 // Middleware
@@ -11,9 +12,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+// Routes Middleware
+app.use("/api/users", userRoute);
+
+
 // Routes
 app.get("/", (req, res) => {
-  res.send("Home page");
+  res.send("Welcome!");
 });
 
 // connect to DB and start server
