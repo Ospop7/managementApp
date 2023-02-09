@@ -11,11 +11,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
+const errorhandler = require("./middleWare/errorhandler");
 
 // Routes Middleware
 app.use("/api/users", userRoute);
-
+app.use(errorhandler);
 
 // Routes
 app.get("/", (req, res) => {
