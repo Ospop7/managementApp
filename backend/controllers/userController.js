@@ -43,6 +43,16 @@ const registerUser = asyncHandler(async (req, res) => {
   //   after create  A    new user we need GENERATE A TOKEN
   const token = generateToken(user._id);
 
+  // after generate a token send that cookies to the client
+  // Send HTTP-only cookies to the client
+  //  cookie name name and , token whish is generate form jwt (above)
+  res.cookie("Generatetoken", token, {
+    path: "/",
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 86400), // 1 day
+    sameSite: "none",
+    secure: true,
+  });
   if (user) {
     const { _id, name, email, photo, phone, bio } = user;
     res.status(201).json({
