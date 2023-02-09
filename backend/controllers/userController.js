@@ -25,16 +25,13 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   //   we gothe hass the password before create the new user
 
-  // encrypt password before saving to Db
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
+  
   // Create new user if user don't exit
   const user = await User.create({
     name,
     email,
-    password: hashedPassword,
+    password,
   });
   if (user) {
     const { _id, name, email, photo, phone, bio } = user;
