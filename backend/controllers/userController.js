@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // after generate a token send that cookies to the client
   // Send HTTP-only cookies to the client
   //  cookie name name and , token whish is generate form jwt (above)
-  res.cookie("Generatetoken", token, {
+  res.cookie("token", token, {
     path: "/",
     httpOnly: true,
     expires: new Date(Date.now() + 1000 * 86400), // 1 day
@@ -133,10 +133,29 @@ const logout = asyncHandler(async (req, res) => {
   return res.status(200).json({ message: "User logged out successfully" });
 });
 
+// Get User Data
+const getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
+  if (user) {
+    const { _id, name, email, photo, phone, bio } = user;
+    res.status(200).json({
+      _id,
+      name,
+      email,
+      photo,
+      phone,
+      bio,
+    });
+  } else {
+    res.status(400);
+    throw new Error("User Not Found");
+  }
+});
 
 module.exports = {
   registerUser,
   loginUser,
   logout,
+  getUser,
 };
