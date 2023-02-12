@@ -1,30 +1,31 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
+const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const userRoute = require("./routes/userRoute");
+const errorhandler = require("./middleWare/errorhandler");
 const cookieParser = require("cookie-parser");
 
-const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const userRoute = require("./routes/userRoute");
+
 const app = express();
 
-// Middleware
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const errorhandler = require("./middleWare/errorhandler");
-
 // Routes Middleware
 app.use("/api/users", userRoute);
-app.use(errorhandler);
 
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome!");
 });
+
+// Error Middleware
+app.use(errorhandler);
 
 // connect to DB and start server
 const port = process.env.PORT || 8087;

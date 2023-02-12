@@ -1,11 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const http = require("http");
+const cookies = require("cookie");
 
 const protect = asyncHandler(async (req, res, next) => {
   try {
     const token = req.cookies.token;
-
+    // console.log(req.cookies);
+    console.log(`token: ${token}`);
     if (!token) {
       res.status(401);
       throw new Error("Not authorized, please login");
@@ -15,13 +18,12 @@ const protect = asyncHandler(async (req, res, next) => {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
     // Get user id from token
     const user = await User.findById(verified.id).select("-password");
-    // - Password means not send the password to the user
 
     if (!user) {
       res.status(401);
       throw new Error("User not found");
     }
-    req.user = user; // if user found
+    req.user = user;
     next();
   } catch (error) {
     res.status(401);
