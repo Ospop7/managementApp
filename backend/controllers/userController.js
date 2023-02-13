@@ -241,8 +241,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   // Create Reste Token
   let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
-  console.log(`Reset Tokaen::${resetToken}`);
-  res.send("Forgot Password");
+  // console.log(`Reset Tokaen::${resetToken}`);
+  // res.send("Forgot Password");
 
   // Hash token before saving to DB
   const hashedToken = crypto
@@ -250,7 +250,18 @@ const forgotPassword = asyncHandler(async (req, res) => {
     .update(resetToken) // token which to be hashed
     .digest("hex"); // hex encoded password
 
-  console.log(`Hashed Token::${hashedToken}`);
+
+
+  // console.log(`Hashed Token::${hashedToken}`);
+
+
+  // Save Token to DB
+  await new Token({
+    userId: user._id,
+    token: hashedToken,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 30 * (60 * 1000), // Thirty minutes
+  }).save();
 });
 
 module.exports = {
