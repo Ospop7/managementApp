@@ -2,6 +2,9 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const Token = require("../models/tokenModel");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // Generate Token
 const generateToken = (id) => {
@@ -196,6 +199,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Password Change
 const changePassword = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { oldPassword, newPassword } = req.body;
@@ -224,8 +228,29 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 });
 
+// Forgot password
+
 const forgotPassword = asyncHandler(async (req, res) => {
-  res.send('forgot password');
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User does not exist");
+  }
+
+  // Create Reste Token
+  let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+  console.log(`Reset Tokaen::${resetToken}`);
+  res.send("Forgot Password");
+
+  // Hash token before saving to DB
+  const hashedToken = crypto
+    .createHash("sha256") // algorithm
+    .update(resetToken) // token which to be hashed
+    .digest("hex"); // hex encoded password
+
+  console.log(`Hashed Token::${hashedToken}`);
 });
 
 module.exports = {
