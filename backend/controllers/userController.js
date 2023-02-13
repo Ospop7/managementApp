@@ -239,6 +239,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
     throw new Error("User does not exist");
   }
 
+   // Delete token if it exists in DB
+   let token = await Token.findOne({ userId: user._id });
+   if (token) {
+     await token.deleteOne();
+   }
+
   // Create Reste Token
   let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
   // console.log(`Reset Tokaen::${resetToken}`);
@@ -275,7 +281,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const subject = "Password Reset Request";
   const send_to = user.email;
   const sent_from = process.env.EMAIL_USER;
-  
+
   try {
     await sendEmail(subject, message, send_to, sent_from);
     res.status(200).json({ success: true, message: "Reset Email Sent" });
@@ -284,6 +290,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     throw new Error("Email not sent, please try again");
   }
 });
+
 module.exports = {
   registerUser,
   loginUser,
